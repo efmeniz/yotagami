@@ -1,3 +1,3 @@
-# yotagami
+# yatogami
 
 A simple Discord Bot
