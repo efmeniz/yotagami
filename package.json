@@ -1,0 +1,19 @@
+{
+  "name": "yatogami",
+  "version": "0.0.1",
+  "description": "A simple Discord Bot",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enesfarukmeniz/yatogami.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/enesfarukmeniz/yatogami/issues"
+  },
+  "homepage": "https://github.com/enesfarukmeniz/yatogami#readme",
+  "dependencies": {
+    "discord.js": "11.0.0"
+  }
+}
