@@ -1,6 +1,5 @@
 const Discord = require("discord.js");
-const client = new Discord.Client();
-
+const sharp = require('sharp');
 try {
     config = require('./../config.json');
 } catch (e) {
@@ -21,6 +20,9 @@ const quotes = [
     "Hai! Goshime arigato gosaimasu! Hayakute, yasukute ashin Delivery god, Yato de gosaimaaasuuuuu!",
     "Gods don't poop"
 ];
+
+const client = new Discord.Client();
+
 
 //This is actually a secret token but atm Yato does not have any authority whatsoever
 client.login(config.token);
@@ -56,6 +58,22 @@ client.on("message", (message) => {
         message.channel.sendMessage("pong!");
     } else if (message.content.startsWith(prefix + "foo")) {
         message.channel.sendMessage("bar!");
+    } else if (message.content.startsWith(prefix + "emojify")) {
+        if (!message.attachments.array().length) {
+            message.channel.sendMessage("Why u no image");
+        } else {
+            const image = message.attachments.array().pop();
+            if (!image.height || !image.width) {
+                message.channel.sendMessage("Why u no proper image");
+            } else {
+
+                sharp(image.url).resize(30, 30).png().toBuffer(function (err, buffer, info) {
+                    console.log(err);
+                    console.log(buffer);
+                    console.log(info);
+                })
+            }
+        }
     }
 });
 
