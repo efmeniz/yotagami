@@ -1,4 +1,6 @@
 const Discord = require("discord.js");
+const JsonDB = require('node-json-db');
+
 const client = new Discord.Client();
 
 try {
@@ -7,6 +9,16 @@ try {
     console.log("Missing config.json file?");
     return;
 }
+
+let databases = [];
+
+const toggleKeys = [
+    "online",
+    "dnd",
+    "idle",
+    "offline",
+    "game"
+];
 
 const quotes = [
     "If people want to die, let them die.",
@@ -32,7 +44,9 @@ client.on('ready', () => {
             url: "https://anidb.net/perl-bin/animedb.pl?show=anime&aid=9925"
         }
     });
+
     client.guilds.array().forEach(function (guild) {
+        databases[guild.id] = new JsonDB("data/" + guild.id, true, false);
         if (guild.available) {
             guild.defaultChannel.sendMessage("Yoshi!");
             //guild.defaultChannel.sendMessage("Kon'nichiwa @everyone");
@@ -56,6 +70,25 @@ client.on("message", (message) => {
         message.channel.sendMessage("pong!");
     } else if (message.content.startsWith(prefix + "foo")) {
         message.channel.sendMessage("bar!");
+    } else if (message.content.startsWith(prefix + "toggle")) {
+        if (!message.guild) {
+            message.channel.sendMessage("This is a server command");
+        } else {
+            let arr = message.content.split(" ");
+            if (!arr[1]) {
+                message.channel.sendMessage("Provide a toggle key");
+            } else if (!toggleKeys.includes(arr[1])) {
+                message.channel.sendMessage("Invalid toggle key");
+            } else {
+                let key = "/toggles/" + arr[1];
+                try {
+                    let data = !databases[message.guild.id].getData(key);
+                    databases[message.guild.id].push(key, data);
+                } catch (e) {
+                    databases[message.guild.id].push(key, false);
+                }
+            }
+        }
     }
 });
 
@@ -85,6 +118,8 @@ client.on("guildMemberRemove", (member) => {
 
 client.on("presenceUpdate", (oldMember, newMember) => {
     const guild = oldMember.guild;
+    let key = "/toggles/" + newMember.presence.status;
+
     const colorMap = {
         online: 0x3CB371,
         offline: 0x808080,
@@ -97,6 +132,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
         message = "User " + oldMember.displayName + " changed status from " + oldMember.presence.status + " to " + newMember.presence.status;
         color = colorMap[newMember.presence.status];
     } else {
+        key = "/toggles/game";
         if (!newMember.presence.game) {
             message = "User " + oldMember.displayName + " stopped playing " + oldMember.presence.game.name;
         } else {
@@ -105,15 +141,22 @@ client.on("presenceUpdate", (oldMember, newMember) => {
         color = 0x4682B4;
     }
 
-    guild.channels.get(guild.id).sendEmbed({
-        author: {
-            name: "Yatogami the Stalker"
-        },
-        color: color,
-        description: message,
-        timestamp: new Date()
-    });
-
+    let result;
+    try {
+        result = databases[guild.id].getData(key);
+    } catch (e) {
+        result = true;
+    }
+    if (result) {
+        guild.channels.get(guild.id).sendEmbed({
+            author: {
+                name: "Yatogami the Stalker"
+            },
+            color: color,
+            description: message,
+            timestamp: new Date()
+        });
+    }
 });
 
 //lol
