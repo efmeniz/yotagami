@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const sharp = require('sharp');
+const base64 = require('node-base64-image');
 try {
     config = require('./../config.json');
 } catch (e) {
@@ -66,12 +67,23 @@ client.on("message", (message) => {
             if (!image.height || !image.width) {
                 message.channel.sendMessage("Why u no proper image");
             } else {
-
-                sharp(image.url).resize(30, 30).png().toBuffer(function (err, buffer, info) {
+                base64.encode(image.url, {}, function (err, response) {
                     console.log(err);
-                    console.log(buffer);
-                    console.log(info);
-                })
+                    console.log(response);
+                    sharp(response).resize(32, 32).png().toBuffer(function (err, buffer, info) {
+                        console.log(err);
+                        console.log(buffer);
+                        console.log(info);
+                        message.channel.sendFile(buffer, "image.png", "Big Emoji");
+                    })
+                    sharp(response).resize(24, 24).png().toBuffer(function (err, buffer, info) {
+                        console.log(err);
+                        console.log(buffer);
+                        console.log(info);
+                        message.channel.sendFile(buffer, "image.png", "Small Emoji");
+                    })
+                });
+
             }
         }
     }
