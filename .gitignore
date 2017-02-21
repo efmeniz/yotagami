@@ -1,7 +1,5 @@
-.project
 .idea
-*.tar.gz
-*.zip
 *.log
+config.json
 node_modules/
 bower_components/
