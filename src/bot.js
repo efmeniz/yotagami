@@ -26,6 +26,12 @@ const quotes = [
 client.login(config.token);
 
 client.on('ready', () => {
+    client.user.setPresence({
+        game: {
+            name: "God",
+            url: "https://anidb.net/perl-bin/animedb.pl?show=anime&aid=9925"
+        }
+    });
     client.guilds.array().forEach(function (guild) {
         if (guild.available) {
             guild.defaultChannel.sendMessage("Yoshi!");
