@@ -16,5 +16,8 @@
   "dependencies": {
     "discord.js": "11.0.0",
     "node-json-db": "0.7.3"
+    "discord.js": "11.0.0",
+    "node-base64-image": "1.0.3",
+    "sharp": "0.17.2"
   }
 }

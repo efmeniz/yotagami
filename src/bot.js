@@ -3,6 +3,8 @@ const JsonDB = require('node-json-db');
 
 const client = new Discord.Client();
 
+const sharp = require('sharp');
+const base64 = require('node-base64-image');
 try {
     config = require('./../config.json');
 } catch (e) {
@@ -33,6 +35,9 @@ const quotes = [
     "Hai! Goshime arigato gosaimasu! Hayakute, yasukute ashin Delivery god, Yato de gosaimaaasuuuuu!",
     "Gods don't poop"
 ];
+
+const client = new Discord.Client();
+
 
 //This is actually a secret token but atm Yato does not have any authority whatsoever
 client.login(config.token);
@@ -87,6 +92,25 @@ client.on("message", (message) => {
                 } catch (e) {
                     databases[message.guild.id].push(key, false);
                 }
+            }
+        }
+    } else if (message.content.startsWith(prefix + "emojify")) {
+        if (!message.attachments.array().length) {
+            message.channel.sendMessage("Why u no image");
+        } else {
+            const image = message.attachments.array().pop();
+            if (!image.height || !image.width) {
+                message.channel.sendMessage("Why u no proper image");
+            } else {
+                base64.encode(image.url, {}, function (err, response) {
+                    sharp(response).resize(32, 32).png().toBuffer(function (err, buffer, info) {
+                        message.channel.sendFile(buffer, "image.png", "Big Emoji");
+                    })
+                    sharp(response).resize(24, 24).png().toBuffer(function (err, buffer, info) {
+                        message.channel.sendFile(buffer, "image.png", "Small Emoji");
+                    })
+                });
+
             }
         }
     }
