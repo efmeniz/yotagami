@@ -68,18 +68,10 @@ client.on("message", (message) => {
                 message.channel.sendMessage("Why u no proper image");
             } else {
                 base64.encode(image.url, {}, function (err, response) {
-                    console.log(err);
-                    console.log(response);
                     sharp(response).resize(32, 32).png().toBuffer(function (err, buffer, info) {
-                        console.log(err);
-                        console.log(buffer);
-                        console.log(info);
                         message.channel.sendFile(buffer, "image.png", "Big Emoji");
                     })
                     sharp(response).resize(24, 24).png().toBuffer(function (err, buffer, info) {
-                        console.log(err);
-                        console.log(buffer);
-                        console.log(info);
                         message.channel.sendFile(buffer, "image.png", "Small Emoji");
                     })
                 });
