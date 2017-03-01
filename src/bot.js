@@ -1,8 +1,5 @@
 const Discord = require("discord.js");
 const JsonDB = require('node-json-db');
-
-const client = new Discord.Client();
-
 const sharp = require('sharp');
 const base64 = require('node-base64-image');
 try {
