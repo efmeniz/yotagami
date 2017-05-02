@@ -15,8 +15,9 @@
   "homepage": "https://github.com/enesfarukmeniz/yatogami#readme",
   "dependencies": {
     "discord.js": "11.0.0",
-    "node-json-db": "0.7.3",
+    "giphy-api": "1.2.5",
     "node-base64-image": "1.0.3",
+    "node-json-db": "0.7.3",
     "sharp": "0.17.2"
   }
 }

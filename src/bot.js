@@ -2,6 +2,8 @@ const Discord = require("discord.js");
 const JsonDB = require('node-json-db');
 const sharp = require('sharp');
 const base64 = require('node-base64-image');
+const giphy = require('giphy-api')();
+
 try {
     config = require('./../config.json');
 } catch (e) {
@@ -35,7 +37,6 @@ const quotes = [
 
 const client = new Discord.Client();
 
-
 //This is actually a secret token but atm Yato does not have any authority whatsoever
 client.login(config.token);
 
@@ -48,9 +49,9 @@ client.on('ready', () => {
     });
 
     client.guilds.array().forEach(function (guild) {
-        databases[guild.id] = new JsonDB("data/" + guild.id, true, false);
+        databases[guild.id] = new JsonDB("./data/" + guild.id, true, false);
         if (guild.available) {
-            guild.defaultChannel.sendMessage("Yoshi!");
+            //guild.defaultChannel.sendMessage("Yoshi!");
             //guild.defaultChannel.sendMessage("Kon'nichiwa @everyone");
         }
     });
@@ -65,8 +66,12 @@ client.on("message", (message) => {
     }
 
     const prefix = "!";
-    if (message.author.bot) return;
-    if (!message.content.startsWith(prefix)) return;
+    if (message.author.bot) {
+        return;
+    }
+    if (!message.content.startsWith(prefix)) {
+        return;
+    }
 
     if (message.content.startsWith(prefix + "ping")) {
         message.channel.sendMessage("pong!");
@@ -103,13 +108,44 @@ client.on("message", (message) => {
                     sharp(response).resize(32, 32).png().toBuffer(function (err, buffer, info) {
                         message.channel.sendFile(buffer, "image.png", "Big Emoji");
                     })
-                    sharp(response).resize(24, 24).png().toBuffer(function (err, buffer, info) {
+                    sharp(response).resize(22, 22).png().toBuffer(function (err, buffer, info) {
                         message.channel.sendFile(buffer, "image.png", "Small Emoji");
                     })
                 });
 
             }
         }
+    } else if (message.content.startsWith(prefix + "randomgif")) {
+        let arr = message.content.split(" ");
+        arr.shift();
+        giphy.random({
+            tag: arr.join(" "),
+            fmt: 'json'
+        }).then(function (result) {
+            message.channel.sendMessage(result.data.image_url);
+        });
+    } else if (message.content.startsWith(prefix + "gif")) {
+        let arr = message.content.split(" ");
+        arr.shift();
+        giphy.search({
+            q: arr.join(" "),
+            limit: 30,
+            offset: 0,
+            fmt: 'json'
+        }).then(function (result) {
+            for (let i = result.data.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                let temp = result.data[i];
+                result.data[i] = result.data[j];
+                result.data[j] = temp;
+            }
+            for (let i = 0; i < 3; i++) {
+                if (result.data[i]) {
+                    message.channel.sendMessage("http://media.giphy.com/media/" + result.data[i].id + "/giphy.gif");
+                }
+            }
+        });
+
     }
 });
 
@@ -138,6 +174,7 @@ client.on("guildMemberRemove", (member) => {
 });
 
 client.on("presenceUpdate", (oldMember, newMember) => {
+    return;
     const guild = oldMember.guild;
     let key = "/toggles/" + newMember.presence.status;
 
@@ -184,4 +221,8 @@ client.on("presenceUpdate", (oldMember, newMember) => {
 client.on("typingStart", (channel, user) => {
     return;
     channel.sendMessage("What are you writing " + user + "? ( ͡° ͜ʖ ͡°)");
+});
+
+process.on('unhandledRejection', function (error, promise) {
+    console.log(error);
 });
